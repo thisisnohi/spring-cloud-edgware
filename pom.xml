@@ -6,7 +6,10 @@
 	<groupId>nohi.demo.springcloud</groupId>
 	<artifactId>spring-cloud-edgware</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<modules>
+		<module>system-service</module>
+	</modules>
+	<packaging>pom</packaging>
 
 	<name>spring-cloud-edgware</name>
 	<description>Demo project for Spring Boot</description>
@@ -29,6 +32,11 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-eureka</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
 		<dependency>

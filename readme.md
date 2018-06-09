@@ -42,12 +42,13 @@
 
 **应用端口规划**
 
-|模块|服务名|端口号|备注|
-|:-:|-|-|-|-|
-|服务发现|discovery|6001,6002|对应两个应用名discovery1,discovery2|
-|配置中心|config-server|6101,6102||
-|网关|gateway|6201,6202||
-
+| 模块 | 服务名 | 端口号 | 备注 |
+| :----: | :----: | :----: | :----: | 
+| 服务发现 | discovery | 6001,6002 | 对应两个域名discovery1,discovery2 |
+| 配置中心 | config-server | 6101,6102  | config1,config2 |
+| 网关 | gateway | 6201,6202 | gateway1,gateway2 |
+| 系统管理服务 | system-service | 8001,8002 | system-service1,system-service2 |
+| 系统管理客户端 | system-view | 8101,8102 | system-view1,system-view2 |
 
 
 ### 2.1 服务发现
