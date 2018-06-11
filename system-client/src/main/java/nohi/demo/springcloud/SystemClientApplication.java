@@ -2,6 +2,7 @@ package nohi.demo.springcloud;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
@@ -13,7 +14,8 @@ import org.springframework.web.client.RestTemplate;
  */
 @SpringBootApplication()
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients   //Feign启用，建议单独使用configure，否则出现 controller映射重复问题： There is already 'userController' bean method
+@EnableCircuitBreaker   //熔断器 或者使用@SpringCloudApplication
 public class SystemClientApplication {
 	/**
 	 * 实例化RestTemplate，通过@LoadBalanced注解开启均衡负载能力.

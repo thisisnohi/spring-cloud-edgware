@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
  * Created by nohi on 2018/6/10.
  */
 @RestController
-@RequestMapping("/userView")
-@Api(value = "/userView",tags = "用户视图")
+@RequestMapping("/user")
+@Api(value = "/user",tags = "用户视图")
 public class UserController {
 
 	@Autowired

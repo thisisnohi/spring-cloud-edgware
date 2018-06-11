@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 /**
  * Created by nohi on 2018/6/9.
  */
-@RequestMapping("user")
+@RequestMapping(value = "user",name = "user")
 public interface InterfaceUserService {
 	@RequestMapping(value = "/getAll", method = RequestMethod.GET)
 	List<UserEntity> getAll();

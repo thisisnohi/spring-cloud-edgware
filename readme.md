@@ -169,6 +169,9 @@ public class UserService {
 > 访问:http://discovery:8101/user/getAll
 
 ### 2.2.2 Feign
+> 声明式服务调用
+
+* application.properties
 ```
 server.port=8101
 #指定该Eureka实例的主机名
@@ -176,15 +179,17 @@ spring.application.name=system-client
 eureka.client.serviceUrl.defaultZone=http://discovery1:6001/eureka/
 eureka.instance.preferIpAddress=true
 ```
+
 * Application
 ```
 @SpringBootApplication()
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients   //Feign启用，建议单独使用configure，否则出现 controller映射重复问题： There is already 'userController' bean method
 public class SystemClientApplication {
-
 ```
+
 * service
+
 ```
 @FeignClient("system-service")
 public interface UserFeignService extends InterfaceUserService{
@@ -206,9 +211,49 @@ public interface InterfaceUserService {
 }
 ```
 
+* configure
+
+```
+/**
+ * Feign启用，建议单独使用configure，否则出现 controller映射重复问题
+ * @see https://github.com/spring-cloud/spring-cloud-netflix/issues/466
+ * Created by nohi on 2018/6/11.
+ */
+@Configuration
+@ConditionalOnClass({Feign.class})
+public class FeignMappingDefaultConfiguration {
+	@Bean
+	public WebMvcRegistrations feignWebRegistrations() {
+		return new WebMvcRegistrationsAdapter() {
+			@Override
+			public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+				return new FeignFilterRequestMappingHandlerMapping();
+			}
+		};
+	}
+
+	private static class FeignFilterRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
+		@Override
+		protected boolean isHandler(Class<?> beanType) {
+			System.out.println("beanType:" + beanType);
+			return super.isHandler(beanType) && (AnnotationUtils.findAnnotation(beanType, FeignClient.class) == null);
+		}
+	}
+}
+```
+
+
+
 ## 2.3 熔断器、监控
 
+>Ribbon with hystrix 自带 http://localhost:8001/hystrix.stream
 
+* pom.xml
+
+
+```
+
+```
 
 ## 2.4 配置中心
 

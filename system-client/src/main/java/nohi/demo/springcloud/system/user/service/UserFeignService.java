@@ -6,6 +6,6 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 /**
  * Created by nohi on 2018/6/10.
  */
-@FeignClient("system-service")
+@FeignClient(value = "system-service",fallback = UserFeignServiceFallback.class )
 public interface UserFeignService extends InterfaceUserService{
 }

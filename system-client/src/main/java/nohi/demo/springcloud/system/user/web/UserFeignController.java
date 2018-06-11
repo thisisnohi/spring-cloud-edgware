@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
  * Created by nohi on 2018/6/10.
  */
 @RestController
-@RequestMapping("/userFeignView")
-@Api(value = "/userFeignView",tags = "用户视图Feign",description = "显示用户视图Feign API")
+@RequestMapping("/userFeign")
+@Api(value = "/userFeign",tags = "用户视图Feign",description = "显示用户视图Feign API")
 public class UserFeignController {
 
 	@Autowired
