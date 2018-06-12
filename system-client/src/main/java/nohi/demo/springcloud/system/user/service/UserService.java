@@ -1,5 +1,6 @@
 package nohi.demo.springcloud.system.user.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,17 +22,22 @@ public class UserService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+
+	@HystrixCommand(fallbackMethod = "fallbackOfgetAll")
 	public List<UserEntity> getAll() {
 		// http://服务提供者的serviceId/url
 		UserEntity[] tmp = this.restTemplate.getForObject("http://system-service/user/getAll",UserEntity[].class);
 		return Arrays.asList(tmp);
 	}
 
+	@HystrixCommand(fallbackMethod = "fallbackOffindUser")
 	public List<UserEntity> findUser(UserEntity info) {
 		// http://服务提供者的serviceId/url
 		ResponseEntity<UserEntity[]> response = this.restTemplate.postForEntity("http://system-service/user/findUser",info,UserEntity[].class);
 		return Arrays.asList( response.getBody() );
 	}
+
+
 	/**
 	 * 使用@HystrixCommand注解指定当该方法发生异常时调用的方法
 	 * @param id id
@@ -41,6 +47,14 @@ public class UserService {
 	public UserEntity get(Long id) {
 		// http://服务提供者的serviceId/url
 		return this.restTemplate.getForObject("http://system-service/user/get/" + id,UserEntity.class);
+	}
+
+	/**
+	 * hystrix fallback方法
+	 */
+	public List<UserEntity> fallbackOfgetAll() {
+		log.info( "异常发生，fallbackOfgetAll，接 收的参数 " );
+		return new ArrayList<>(  );
 	}
 
 	/**

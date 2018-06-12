@@ -49,6 +49,7 @@ Spring Cloud 全家桶
 | 网关 | gateway | 6201,6202 | gateway1,gateway2 |
 | 系统管理服务 | system-service | 8001,8002 | system-service1,system-service2 |
 | 系统管理客户端 | system-view | 8101,8102 | system-view1,system-view2 |
+| 监控 | hystrix-trubine | 6300 | - |
 
 
 ## 2.1 服务发现
@@ -245,18 +246,155 @@ public class FeignMappingDefaultConfiguration {
 
 
 ## 2.3 熔断器、监控
+>http://localhost:8101/hystrix.stream ，需要先访问ribbon请求 如: http://192.168.56.1:8101/user/get/111  http://192.168.56.1:8101/user/getAll
 
->Ribbon with hystrix 自带 http://localhost:8001/hystrix.stream
+### 2.3.1 Ribbon with hystrix
+>Ribbon with hystrix 自带 http://localhost:8101/hystrix.stream
 
 * pom.xml
 
+```
+<!-- 整合ribbon -->
+<dependency>
+	<groupId>org.springframework.cloud</groupId>
+	<artifactId>spring-cloud-starter-ribbon</artifactId>
+</dependency>
 
+<!-- 整合hystrix -->
+<dependency>
+	<groupId>org.springframework.cloud</groupId>
+	<artifactId>spring-cloud-starter-hystrix</artifactId>
+</dependency>
 ```
 
+* service
+服务访问不了，会进入该方法，服务降级
 ```
+@HystrixCommand(fallbackMethod = "fallbackOfgetAll")
+public List<UserEntity> getAll() {
+... 
+public List<UserEntity> fallbackOfgetAll() {
+	log.info( "异常发生，fallbackOfgetAll，接 收的参数 " );
+	return new ArrayList<>(  );
+}
+```
+
+
+### 2.3.2 Ribbon with hystrix
+
+* pom.xml
+
+```
+ <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-feign</artifactId>
+</dependency>
+ <!-- 整合hystrix，其实feign中自带了hystrix，引入该依赖主要是为了使用其中的hystrix-metrics-event-stream，用于dashboard -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-hystrix</artifactId>
+</dependency>
+```
+
+* application
+
+```
+@EnableFeignClients   //Feign启用，建议单独使用configure，否则出现 controller映射重复问题： There is already 'userController' bean method
+@EnableCircuitBreaker   //熔断器 或者使用@SpringCloudApplication
+public class SystemClientApplication {
+```
+
+* application.properties
+```
+# Feign使用Hystrix无效原因及解决方法
+feign.hystrix.enabled=true
+```
+
+* service
+
+```
+@FeignClient(value = "system-service",fallback = UserFeignServiceFallback.class )
+public interface UserFeignService extends InterfaceUserService{
+
+/**
+ * Feign的Fallback对应的类必须先实例化
+ * Created by nohi on 2018/6/10.
+ */
+@Component
+@Scope(value = "singleton")
+public class UserFeignServiceFallback implements UserFeignService {
+```
+
+
+* 问题
+	* No fallback instance of type class
+	  Feign的Fallback对应的类必须先实例化
+
+### 2.3.3 hystrix-turbine
+
+* pom.xml
+
+```
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-turbine</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-netflix-turbine</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
+</dependency>
+```
+
+* application.properties
+
+```
+server.port=6300
+
+# 管理端点安全关闭
+management.security.enabled=false
+
+#指定该Eureka实例的主机名
+spring.application.name=hystrix-turbine
+eureka.client.serviceUrl.defaultZone=http://discovery1:6001/eureka/
+eureka.instance.preferIpAddress=true
+
+security.basic.enabled=false
+
+# 指定聚合哪些集群，多个使用","分割，默认为default。可使用http://.../turbine.stream?cluster={clusterConfig之一}访问
+turbine.aggregator.clusterConfig=default
+
+### 配置Eureka中的serviceId列表，表明监控哪些服务
+turbine.appConfig=system-client
+# 1. clusterNameExpression指定集群名称，默认表达式appName；
+#     此时：turbine.aggregator.clusterConfig需要配置想要监控的应用名称
+# 2. 当clusterNameExpression: default时，turbine.aggregator.clusterConfig可以不写，因为默认就是default
+# 3. 当clusterNameExpression: metadata['cluster']时，
+#     假设想要监控的应用配置了eureka.instance.metadata-map.cluster: ABC，则需要配置，
+#      同时turbine.aggregator.clusterConfig: ABC
+turbine.clusterNameExpression=new String("default")
+
+# 访问地址http://localhost:6300/turbine.stream
+```
+
+* application
+
+```
+@SpringBootApplication
+@EnableTurbine
+@EnableHystrixDashboard
+public class HystrixTurbineApplication {
+
+```	
+
+>访问地址：http://localhost:6300/hystrix.stream  输入 http://localhost:6300/turbine.stream
+
 
 ## 2.4 配置中心
-
 
 
 ## 2.5 网关(API Gateway)

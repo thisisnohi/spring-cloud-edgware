@@ -31,7 +31,6 @@ public class FeignMappingDefaultConfiguration {
 	private static class FeignFilterRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 		@Override
 		protected boolean isHandler(Class<?> beanType) {
-			System.out.println("beanType:" + beanType);
 			return super.isHandler(beanType) && (AnnotationUtils.findAnnotation(beanType, FeignClient.class) == null);
 		}
 	}

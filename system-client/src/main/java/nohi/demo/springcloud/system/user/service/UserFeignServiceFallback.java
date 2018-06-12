@@ -6,10 +6,15 @@ import java.util.List;
 import nohi.demo.springcloud.system.user.entity.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
+ * Feign的Fallback对应的类必须先实例化
  * Created by nohi on 2018/6/10.
  */
+@Component
+@Scope(value = "singleton")
 public class UserFeignServiceFallback implements UserFeignService {
 	private static final Logger log = LoggerFactory.getLogger( UserFeignServiceFallback.class );
 

@@ -10,6 +10,8 @@
 		<module>system-service-api</module>
 		<module>system-service</module>
 		<module>system-client</module>
+		<module>hystrix-turbine</module>
+		<module>hystrix-dashboard</module>
 	</modules>
 	<packaging>pom</packaging>
 

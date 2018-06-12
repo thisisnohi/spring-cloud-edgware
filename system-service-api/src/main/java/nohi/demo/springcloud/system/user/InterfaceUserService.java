@@ -19,7 +19,7 @@ public interface InterfaceUserService {
 	@RequestMapping(value = "/findUser", method = RequestMethod.POST)
 	List<UserEntity> findUser(@RequestBody UserEntity userInfo);
 
-	@RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+	@RequestMapping(value = "get/{userId}", method = RequestMethod.GET)
 	UserEntity get(@PathVariable("userId") Long userId);
 
 }
